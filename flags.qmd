@@ -1,0 +1,527 @@
+---
+title: "World Flags Explorer: Aesthetics, Symbolism & Governance"
+subtitle: "An Educational Guide Organizing All 254 World & Territory Flags by Visual Aesthetic, Government Style, and Geography"
+format:
+  html:
+    theme: cosmo
+    page-layout: full
+    toc: true
+    toc-location: left
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{=html}
+<style>
+  .hero-banner {
+    background: linear-gradient(135deg, #fdf2f8 0%, #f8fafc 50%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  }
+  .spotlight-card {
+    display: grid;
+    grid-template-columns: minmax(280px, 460px) 1fr;
+    gap: 2rem;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+  @media (max-width: 768px) {
+    .spotlight-card {
+      grid-template-columns: 1fr;
+    }
+  }
+  .spotlight-img-wrap {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+  }
+  .spotlight-img-wrap img {
+    max-width: 100%;
+    max-height: 280px;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .badge-pill {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+  .badge-fem {
+    background: #fce7f3;
+    color: #9d174d;
+    border: 1px solid #f9a8d4;
+  }
+  .badge-masc {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+  .badge-gov {
+    background: #e0f2fe;
+    color: #075985;
+    border: 1px solid #bae6fd;
+  }
+  .badge-region {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+  }
+  .flag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+  }
+  .flag-card {
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .flag-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  }
+  .flag-card.fem-card {
+    border-top: 4px solid #ec4899;
+  }
+  .flag-card.masc-card {
+    border-top: 4px solid #991b1b;
+  }
+  .flag-card-img {
+    height: 165px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .flag-card-img img {
+    max-height: 140px;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .flag-card-body {
+    padding: 1rem 1.15rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .flag-card-title {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .flag-card-code {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-family: monospace;
+    background: #f1f5f9;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+  }
+  .flag-card-desc {
+    font-size: 0.88rem;
+    color: #475569;
+    line-height: 1.45;
+    margin-top: 0.5rem;
+  }
+  .filter-bar {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+</style>
+```
+
+```{r}
+library(tidyverse)
+library(countrycode)
+
+# 1. Read all 254 flag files from w2560/
+flag_files <- list.files("w2560", pattern = "\\.png$") |> sort()
+
+# 2. Feminine aesthetic classification (125 flags with floral motifs, pastel/sky/pink/light palettes, or soft harmonious designs)
+feminine_codes <- c(
+  "aq", "ar", "as", "at", "aw", "ax", "az", "bg", "bh", "bi", "bl", "bn", "bq",
+  "bs", "bt", "bw", "ca", "cd", "cf", "ci", "cl", "cr", "cu", "cy", "cz", "dj",
+  "dm", "dz", "ec", "ee", "er", "es", "fi", "fj", "fm", "fo", "fr", "ga", "gb",
+  "gb-eng", "gb-nir", "gb-sct", "gb-wls", "ge", "gg", "gi", "gl", "gn", "gr",
+  "gt", "gw", "gy", "hk", "hn", "hr", "hu", "id", "ie", "il", "in", "io", "is",
+  "it", "je", "jp", "km", "kr", "lb", "lc", "lr", "ls", "lu", "mc", "mf", "mg",
+  "ml", "mm", "mo", "mp", "mt", "mu", "my", "nc", "ne", "ng", "ni", "nl", "np",
+  "nu", "pa", "pe", "pf", "pl", "pm", "pr", "pw", "py", "qa", "re", "ru", "rw",
+  "se", "sg", "si", "sk", "sl", "sm", "so", "sr", "sv", "sz", "tf", "th", "tj",
+  "tv", "tz", "ua", "um", "us", "uy", "uz", "va", "vi", "xk", "yt"
+)
+
+# 3. Government style lookup by ISO-2 code
+monarchies_const <- c(
+  "ad", "ag", "au", "be", "bs", "bt", "bz", "ca", "dk", "es", "gb", "gd", "jm",
+  "jp", "kh", "kn", "kw", "lc", "li", "ls", "lu", "ma", "mc", "my", "nl", "no",
+  "nz", "pg", "sb", "se", "th", "to", "tv", "vc", "ws"
+)
+monarchies_abs <- c("bn", "om", "qa", "sa", "sz", "va", "ae")
+federal_pres <- c("ar", "br", "km", "FM", "fm", "mx", "ng", "ss", "us", "ve")
+federal_parl <- c("at", "au", "ba", "be", "ca", "ch", "de", "et", "in", "iq", "my", "np", "pk", "ru", "so", "st", "ae")
+one_party_or_transitional <- c("af", "cn", "cu", "er", "kp", "la", "mm", "sd", "sy", "td", "vn", "ye", "bf", "ml", "ne", "gn", "ga")
+parl_republics <- c(
+  "al", "am", "bb", "bd", "bg", "cz", "dm", "ee", "fi", "FJ", "fj", "ge", "gr",
+  "hr", "hu", "ie", "il", "is", "it", "lb", "lt", "lv", "md", "me", "mk", "mt",
+  "mu", "pl", "pt", "ro", "rs", "sg", "si", "sk", "sm", "tl", "tr", "tt", "vu", "xk", "za"
+)
+territories <- c(
+  "ai", "aq", "as", "aw", "ax", "bl", "bm", "bq", "bv", "cc", "ck", "cw", "cx",
+  "eh", "fk", "fo", "gf", "gg", "gi", "gl", "gp", "gs", "gu", "hk", "hm", "im",
+  "io", "je", "ky", "mf", "mo", "mp", "mq", "ms", "nc", "nf", "nu", "pf", "pm",
+  "pn", "pr", "ps", "re", "sh", "sj", "sx", "tc", "tf", "tk", "tw", "um", "vg",
+  "vi", "wf", "yt"
+)
+
+# 4. Special featured descriptions for standout Feminine & Masculine flags
+featured_notes <- c(
+  "hk" = "Features a stylized white five-petal Bauhinia blakeana orchid flower in the center of a vibrant red field, blending floral elegance with civic symmetry.",
+  "mp" = "Showcases a traditional Chamorro latte stone encircled by a colorful floral head wreath (mwarmwar) of ylang-ylang, plumeria, ginger, and hibiscus flowers on a soft Pacific blue background.",
+  "es" = "One of the very few national flags to include pinkish-purple: the historic Crowned Lion of León on Spain's coat of arms is rendered in purpure (heraldic purple-pink).",
+  "dm" = "Famous for featuring the purple-chested Sisserou parrot (Imperial Amazon), making Dominica one of the only sovereign nations with purple prominently on its flag.",
+  "mo" = "Displays a serene white three-petal lotus flower above a stylized bridge and water beneath an arc of five golden stars.",
+  "ar" = "Known for its soft sky-blue (celeste) and white bands inspired by the clouds and sky, centered with the golden Sun of May.",
+  "bs" = "Pairs soft aquamarine blue bands (representing Caribbean waters) with warm golden sand.",
+  "pw" = "Uses a gentle pastel sky-blue field representing the Pacific Ocean with a soft golden full moon.",
+  "mz" = "Widely considered the boldest martial flag in the world: it features an AK-47 assault rifle with a fixed bayonet crossed with an iron hoe over an open book and star.",
+  "ao" = "Divided starkly into crimson red and jet black, emblazoned with a crossed machete, industrial gear wheel, and golden star.",
+  "al" = "Features a fierce, black double-headed eagle—symbol of Skanderbeg and sovereign vigilance—set against a deep blood-red background.",
+  "lk" = "Displays a golden heraldic lion gripping a castane sword in its right forepaw on a deep crimson panel bordered in gold.",
+  "sa" = "Features the white thuluth script Shahada above an unsheathed horizontal saber on a deep green field.",
+  "ke" = "Centers a traditional Maasai warrior shield crossed by two white spears over bold black, crimson, and forest-green stripes.",
+  "pg" = "Divided diagonally into stark black and crimson red with the Southern Cross and a soaring Raggiana bird-of-paradise.",
+  "ug" = "Uses six high-contrast bands of black, yellow, and red centered with a bold crested crane."
+)
+
+# 5. Build the complete 254-row table
+flags_df <- tibble(file = flag_files) |>
+  mutate(
+    code = str_remove(file, "\\.png$"),
+    iso2_upper = toupper(code)
+  ) |>
+  left_join(
+    countrycode::codelist |>
+      select(
+        iso2c,
+        country_name = cldr.short.en,
+        continent,
+        subregion = region23,
+        currency
+      ),
+    by = c("iso2_upper" = "iso2c")
+  ) |>
+  mutate(
+    country_name = case_match(
+      code,
+      "gb-eng" ~ "England",
+      "gb-nir" ~ "Northern Ireland",
+      "gb-sct" ~ "Scotland",
+      "gb-wls" ~ "Wales",
+      "xk" ~ "Kosovo",
+      .default = coalesce(country_name, iso2_upper)
+    ),
+    continent = case_when(
+      code %in% c("gb-eng", "gb-nir", "gb-sct", "gb-wls", "xk") ~ "Europe",
+      code == "aq" ~ "Antarctica",
+      code %in% c("bv", "gs", "hm", "tf") ~ "Antarctica & Southern Ocean",
+      code == "tw" ~ "Asia",
+      TRUE ~ coalesce(continent, "Global / Insular")
+    ),
+    subregion = case_when(
+      code %in% c("gb-eng", "gb-nir", "gb-sct", "gb-wls") ~ "Northern Europe",
+      code == "xk" ~ "Southern Europe",
+      code == "tw" ~ "Eastern Asia",
+      code %in% c("aq", "bv", "gs", "hm", "tf") ~ "Polar & Sub-Antarctic",
+      TRUE ~ coalesce(subregion, continent)
+    ),
+    category = if_else(code %in% feminine_codes, "Feminine", "Masculine"),
+    is_featured = code %in% names(featured_notes),
+    government = case_when(
+      code %in% c("gb-eng", "gb-nir", "gb-sct", "gb-wls") ~ "Constituent Country of the UK (Devolved Parliament/Assembly)",
+      code %in% c("hk", "mo") ~ "Special Administrative Region (China)",
+      code == "va" ~ "Ecclesiastical Elective Theocracy (Holy See)",
+      code == "aq" ~ "Antarctic Treaty System Condominium",
+      code == "tw" ~ "Unitary Semi-Presidential Republic",
+      code == "ch" ~ "Federal Directorial Republic",
+      code == "ir" ~ "Unitary Theocratic Islamic Republic",
+      code %in% territories ~ "Overseas Territory / Autonomous Dependency",
+      code %in% monarchies_abs ~ "Absolute / Executive Monarchy",
+      code %in% monarchies_const ~ "Parliamentary Constitutional Monarchy",
+      code %in% federal_pres ~ "Federal Presidential Republic",
+      code %in% federal_parl ~ "Federal Parliamentary Republic",
+      code %in% one_party_or_transitional ~ "One-Party or Transitional State",
+      code %in% parl_republics ~ "Unitary Parliamentary Republic",
+      TRUE ~ "Unitary Presidential / Semi-Presidential Republic"
+    ),
+    aesthetic_style = if_else(
+      category == "Feminine",
+      "Soft, Floral, Pastel & Luminous Palette",
+      "Bold, Dark, Heraldic & High-Contrast Palette"
+    ),
+    description = case_when(
+      code %in% names(featured_notes) ~ paste0(
+        country_name, " is located in ", subregion, " (", continent, ") and governed as a ",
+        government, ". ", unname(featured_notes[code])
+      ),
+      category == "Feminine" ~ paste0(
+        country_name, " is located in ", subregion, " (", continent, ") with a ",
+        government, ". Its flag belongs to the Feminine collection thanks to its bright, open, or harmonious color balance and welcoming civic symbolism."
+      ),
+      TRUE ~ paste0(
+        country_name, " is located in ", subregion, " (", continent, ") with a ",
+        government, ". Its flag belongs to the Masculine collection, featuring bold primary or dark tones, strong geometric contrast, or classic heraldic emblems."
+      )
+    )
+  ) |>
+  arrange(country_name)
+
+# Pass the structured dataset to Observable JS
+ojs_define(flags_data = flags_df)
+```
+
+::: {.hero-banner}
+### Welcome to the World Flag Aesthetic & Civics Atlas
+Every flag tells two stories at once: a **visual story** (through color psychology, floral and natural motifs, or martial heraldry) and a **civic story** (how the nation or territory is governed).
+
+On this page, all **254 flags** in our dataset are organized into two visual design families:
+
+* <span class="badge-pill badge-fem">🌸 Feminine Flags (125)</span> — Flags featuring floral emblems (orchids, lotus flowers, island flower wreaths), rare purple/pink pigments, luminous sky-blue and pastel palettes, or serene, airy compositions.
+* <span class="badge-pill badge-masc">⚔️ Masculine Flags (129)</span> — Flags featuring martial symbolism (swords, spears, machetes, rifles), fierce heraldic beasts (eagles, lions, dragons), or high-contrast crimson, black, and deep-toned geometry.
+:::
+
+## 🔍 Interactive Flag Spotlight
+
+Use the controls below to filter by aesthetic category and pick any of the **254 countries and territories** to inspect its high-resolution flag, government style, and civic profile.
+
+```{ojs}
+flags = transpose(flags_data)
+
+viewof spotlight_cat = Inputs.radio(
+  ["All (254)", "🌸 Feminine (125)", "⚔️ Masculine (129)"],
+  { label: "Filter dropdown by aesthetic:", value: "All (254)" }
+)
+
+filtered_spotlight_list = flags.filter(d => {
+  if (spotlight_cat.startsWith("🌸")) return d.category === "Feminine";
+  if (spotlight_cat.startsWith("⚔️")) return d.category === "Masculine";
+  return true;
+})
+
+viewof selected_country = Inputs.select(filtered_spotlight_list, {
+  label: "Select a Country or Territory:",
+  format: d => `${d.country_name} (${d.code.toUpperCase()}) — ${d.category === "Feminine" ? "🌸 Feminine" : "⚔️ Masculine"}`,
+  value: filtered_spotlight_list.find(d => d.code === "hk") || filtered_spotlight_list[0]
+})
+
+html`<div class="spotlight-card">
+  <div class="spotlight-img-wrap">
+    <img src="w2560/${selected_country.file}" alt="${selected_country.country_name} flag">
+  </div>
+  <div>
+    <div style="margin-bottom: 0.5rem;">
+      <span class="badge-pill ${selected_country.category === 'Feminine' ? 'badge-fem' : 'badge-masc'}">
+        ${selected_country.category === 'Feminine' ? '🌸 Feminine Aesthetic' : '⚔️ Masculine Aesthetic'}
+      </span>
+      <span class="badge-pill badge-gov">🏛️ ${selected_country.government}</span>
+      <span class="badge-pill badge-region">🌍 ${selected_country.subregion}</span>
+    </div>
+    <h2 style="margin-top: 0.25rem; margin-bottom: 0.5rem;">
+      ${selected_country.country_name}
+      <span style="font-size: 0.95rem; color: #64748b; font-weight: 500;">(${selected_country.code.toUpperCase()})</span>
+    </h2>
+    <p style="font-size: 1.02rem; color: #334155; line-height: 1.6; margin-bottom: 0.9rem;">
+      ${selected_country.description}
+    </p>
+    <div style="font-size: 0.88rem; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 0.75rem;">
+      <strong>Visual Design Note:</strong> ${selected_country.aesthetic_style} &nbsp;|&nbsp;
+      <strong>Continent:</strong> ${selected_country.continent} &nbsp;|&nbsp;
+      <strong>Currency Code:</strong> ${selected_country.currency || "N/A"}
+    </div>
+  </div>
+</div>`
+```
+
+---
+
+## 📚 Complete 254-Flag Directory by Aesthetic Category
+
+Click between the tabs below to explore all **125 Feminine flags**, all **129 Masculine flags**, or filter by continent and government style across the entire globe.
+
+::: {.panel-tabset}
+
+### 🌸 Feminine Flags (125)
+
+Flags in this collection emphasize **floral symbolism** (such as Hong Kong's *Bauhinia* orchid, Macau's lotus, and the Northern Mariana Islands' floral *mwarmwar* wreath), **rare pink/purple pigments** (Spain and Dominica), or **airy pastel, sky-blue, and luminous white palettes**.
+
+```{ojs}
+viewof search_fem = Inputs.text({
+  label: "Search Feminine Flags:",
+  placeholder: "Type a country, region, or government style (e.g., Hong Kong, Monarchy, Europe)..."
+})
+
+fem_flags = flags
+  .filter(d => d.category === "Feminine")
+  .sort((a, b) => (b.is_featured - a.is_featured) || a.country_name.localeCompare(b.country_name))
+  .filter(d => {
+    const q = search_fem.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      d.country_name.toLowerCase().includes(q) ||
+      d.government.toLowerCase().includes(q) ||
+      d.subregion.toLowerCase().includes(q) ||
+      d.description.toLowerCase().includes(q) ||
+      d.code.toLowerCase().includes(q)
+    );
+  })
+
+html`<p style="color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">
+  Showing <strong>${fem_flags.length}</strong> of 125 Feminine flags (featured floral & pastel highlights appear first):
+</p>
+<div class="flag-grid">
+  ${fem_flags.map(d => html`<div class="flag-card fem-card">
+    <div class="flag-card-img">
+      <img src="w2560/${d.file}" loading="lazy" alt="${d.country_name}">
+    </div>
+    <div class="flag-card-body">
+      <div class="flag-card-title">
+        <span>${d.is_featured ? "🌸 " : ""}${d.country_name}</span>
+        <span class="flag-card-code">${d.code.toUpperCase()}</span>
+      </div>
+      <div>
+        <span class="badge-pill badge-gov" style="font-size: 0.74rem; padding: 0.18rem 0.55rem;">🏛️ ${d.government}</span>
+        <span class="badge-pill badge-region" style="font-size: 0.74rem; padding: 0.18rem 0.55rem;">🌍 ${d.subregion}</span>
+      </div>
+      <div class="flag-card-desc">${d.description}</div>
+    </div>
+  </div>`)}
+</div>`
+```
+
+### ⚔️ Masculine Flags (129)
+
+Flags in this collection emphasize **martial hardware** (such as Mozambique's AK-47 with bayonet, Angola's machete, Saudi Arabia's saber, and Kenya's warrior shield & spears), **fierce heraldic beasts** (Albania's black double-headed eagle, Sri Lanka's sword-wielding lion), and **bold black, crimson, and deep-toned contrast**.
+
+```{ojs}
+viewof search_masc = Inputs.text({
+  label: "Search Masculine Flags:",
+  placeholder: "Type a country, region, or government style (e.g., Mozambique, Republic, Africa)..."
+})
+
+masc_flags = flags
+  .filter(d => d.category === "Masculine")
+  .sort((a, b) => (b.is_featured - a.is_featured) || a.country_name.localeCompare(b.country_name))
+  .filter(d => {
+    const q = search_masc.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      d.country_name.toLowerCase().includes(q) ||
+      d.government.toLowerCase().includes(q) ||
+      d.subregion.toLowerCase().includes(q) ||
+      d.description.toLowerCase().includes(q) ||
+      d.code.toLowerCase().includes(q)
+    );
+  })
+
+html`<p style="color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">
+  Showing <strong>${masc_flags.length}</strong> of 129 Masculine flags (featured martial & heraldic highlights appear first):
+</p>
+<div class="flag-grid">
+  ${masc_flags.map(d => html`<div class="flag-card masc-card">
+    <div class="flag-card-img">
+      <img src="w2560/${d.file}" loading="lazy" alt="${d.country_name}">
+    </div>
+    <div class="flag-card-body">
+      <div class="flag-card-title">
+        <span>${d.is_featured ? "⚔️ " : ""}${d.country_name}</span>
+        <span class="flag-card-code">${d.code.toUpperCase()}</span>
+      </div>
+      <div>
+        <span class="badge-pill badge-gov" style="font-size: 0.74rem; padding: 0.18rem 0.55rem;">🏛️ ${d.government}</span>
+        <span class="badge-pill badge-region" style="font-size: 0.74rem; padding: 0.18rem 0.55rem;">🌍 ${d.subregion}</span>
+      </div>
+      <div class="flag-card-desc">${d.description}</div>
+    </div>
+  </div>`)}
+</div>`
+```
+
+### 🌍 Filter by Continent & Government (All 254)
+
+Explore how flag aesthetics and government systems vary across continents.
+
+```{ojs}
+continents = ["All Continents", ...new Set(flags.map(d => d.continent)).values()].sort()
+gov_types = ["All Government Styles", ...new Set(flags.map(d => d.government)).values()].sort()
+
+viewof filter_continent = Inputs.select(continents, { label: "Continent:", value: "All Continents" })
+viewof filter_gov = Inputs.select(gov_types, { label: "Government Style:", value: "All Government Styles" })
+viewof filter_aes = Inputs.radio(["Both", "Feminine", "Masculine"], { label: "Aesthetic:", value: "Both" })
+
+all_filtered = flags.filter(d => {
+  if (filter_continent !== "All Continents" && d.continent !== filter_continent) return false;
+  if (filter_gov !== "All Government Styles" && d.government !== filter_gov) return false;
+  if (filter_aes !== "Both" && d.category !== filter_aes) return false;
+  return true;
+})
+
+html`<p style="color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">
+  Matching <strong>${all_filtered.length}</strong> flags:
+</p>
+<div class="flag-grid">
+  ${all_filtered.map(d => html`<div class="flag-card ${d.category === 'Feminine' ? 'fem-card' : 'masc-card'}">
+    <div class="flag-card-img">
+      <img src="w2560/${d.file}" loading="lazy" alt="${d.country_name}">
+    </div>
+    <div class="flag-card-body">
+      <div class="flag-card-title">
+        <span>${d.country_name}</span>
+        <span class="flag-card-code">${d.code.toUpperCase()}</span>
+      </div>
+      <div>
+        <span class="badge-pill ${d.category === 'Feminine' ? 'badge-fem' : 'badge-masc'}" style="font-size: 0.72rem; padding: 0.15rem 0.5rem;">
+          ${d.category === 'Feminine' ? '🌸 Feminine' : '⚔️ Masculine'}
+        </span>
+        <span class="badge-pill badge-gov" style="font-size: 0.72rem; padding: 0.15rem 0.5rem;">🏛️ ${d.government}</span>
+      </div>
+      <div class="flag-card-desc">${d.description}</div>
+    </div>
+  </div>`)}
+</div>`
+```
+
+:::
